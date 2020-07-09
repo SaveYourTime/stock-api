@@ -10,6 +10,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
     'prettier',
     'prettier/@typescript-eslint',
+    'plugin:prettier/recommended',
   ],
   root: true,
   env: {
@@ -20,5 +21,10 @@ module.exports = {
     '@typescript-eslint/interface-name-prefix': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    '@typescript-eslint/no-unused-vars': [
+      'warn',
+      { argsIgnorePattern: '^type$' },
+    ],
   },
+  ignorePatterns: ['.eslintrc.js', '/src/config/ormconfig.js'],
 };

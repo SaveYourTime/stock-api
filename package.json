@@ -93,5 +93,15 @@
     },
     "coverageDirectory": "../coverage",
     "testEnvironment": "node"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "{src,apps,libs,test}/**/*.{js,ts}": [
+      "eslint --fix"
+    ]
   }
 }
