@@ -24,8 +24,8 @@ export class Stock extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
-  category: string; // TODO: join table
+  @Column({ nullable: true })
+  category?: string; // TODO: new entity - StockCategory
 
   @Column({ nullable: true })
   type?: StockType;
@@ -51,14 +51,14 @@ export class Stock extends BaseEntity {
   @OneToMany(
     (type) => Hst,
     (hst) => hst.stock,
-    { eager: false },
+    { eager: false, cascade: true },
   )
   hst?: Hst[];
 
   @OneToMany(
     (type) => Top,
     (top) => top.stock,
-    { eager: false },
+    { eager: false, cascade: true },
   )
   top?: Top[];
 }
