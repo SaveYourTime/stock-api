@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { StockRepository } from './stock.repository';
 import { Stock } from './stock.entity';
+import Crawler from '../crawler';
 
 @Injectable()
 export class StocksService {
@@ -12,7 +13,16 @@ export class StocksService {
   }
 
   @Cron('0 0 15 * * 1-5') // Monday to Friday at 03:00pm
-  handleCron(): void {
-    console.log('Called on Monday to Friday at 03:00pm');
+  async handleCronHST(): Promise<void> {
+    const crawler = new Crawler();
+    const stocks = await crawler.getHSTStocks();
+    stocks.forEach((stock) => this.stockRepository.insertHST(stock));
+  }
+
+  @Cron('0 0 15 * * 1-5') // Monday to Friday at 03:00pm
+  async handleCronTOP(): Promise<void> {
+    const crawler = new Crawler();
+    const stocks = await crawler.getTOPStocks();
+    stocks.forEach((stock) => this.stockRepository.insertTOP(stock));
   }
 }

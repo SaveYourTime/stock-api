@@ -7,10 +7,12 @@ import {
   UpdateDateColumn,
   ManyToOne,
   JoinColumn,
+  Unique,
 } from 'typeorm';
 import { Stock } from './stock.entity';
 
 @Entity()
+@Unique(['stock', 'date'])
 export class Top extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
@@ -28,6 +30,9 @@ export class Top extends BaseEntity {
 
   @Column()
   stockId: number;
+
+  @Column()
+  rank: number;
 
   @Column({ type: 'date' })
   date: Date;

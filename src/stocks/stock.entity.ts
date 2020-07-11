@@ -51,14 +51,14 @@ export class Stock extends BaseEntity {
   @OneToMany(
     (type) => Hst,
     (hst) => hst.stock,
-    { eager: false, cascade: true },
+    { eager: true, cascade: true },
   )
   hst?: Hst[];
 
   @OneToMany(
     (type) => Top,
     (top) => top.stock,
-    { eager: false, cascade: true },
+    { eager: true, cascade: true },
   )
   top?: Top[];
 }
