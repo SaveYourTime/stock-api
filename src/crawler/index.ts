@@ -16,6 +16,19 @@ export default class Crawler {
 
   private async open(url: string): Promise<void> {
     this.page = await this.browser.newPage();
+    await this.page.setRequestInterception(true);
+    this.page.on('request', (interceptedRequest) => {
+      const url = interceptedRequest.url();
+      if (
+        url.endsWith('.png') ||
+        url.endsWith('.jpg') ||
+        url.endsWith('.gif')
+      ) {
+        interceptedRequest.abort();
+      } else {
+        interceptedRequest.continue();
+      }
+    });
     await this.page.goto(url);
   }
 
