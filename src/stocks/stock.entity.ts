@@ -52,7 +52,7 @@ export class Stock extends BaseEntity {
   @Column({ nullable: true })
   capital?: string;
 
-  @Column({ nullable: true })
+  @Column({ type: 'text', nullable: true })
   description?: string;
 
   @Column({ type: 'date', nullable: true })
