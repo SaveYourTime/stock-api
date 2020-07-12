@@ -7,8 +7,11 @@ import {
   UpdateDateColumn,
   Unique,
   OneToMany,
+  ManyToOne,
+  JoinColumn,
 } from 'typeorm';
 import { StockType } from './stock-type.enum';
+import { Category } from './category.entity';
 import { Hst } from './hst.entity';
 import { Top } from './top.entity';
 
@@ -25,7 +28,23 @@ export class Stock extends BaseEntity {
   name: string;
 
   @Column({ nullable: true })
-  category?: string; // TODO: new entity - StockCategory
+  companyName?: string;
+
+  @ManyToOne(
+    (type) => Category,
+    (category) => category.stock,
+    {
+      eager: true,
+      cascade: true,
+      nullable: true,
+      onUpdate: 'CASCADE',
+    },
+  )
+  @JoinColumn({ name: 'category_id', referencedColumnName: 'id' })
+  category?: Category;
+
+  @Column({ nullable: true })
+  categoryId?: number;
 
   @Column({ nullable: true })
   type?: StockType;

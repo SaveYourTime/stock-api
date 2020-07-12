@@ -1,9 +1,11 @@
 import { InternalServerErrorException } from '@nestjs/common';
 import { EntityRepository, Repository } from 'typeorm';
-import { Stock } from './stock.entity';
 import { Hst } from './hst.entity';
 import { Top } from './top.entity';
-import { StockInfo } from '../crawler/stock-info.interface';
+import { Stock } from './stock.entity';
+import { Category } from './category.entity';
+import { StockInfo } from './stock-info.interface';
+import { StockDetail } from './stock-detail.interface';
 
 @EntityRepository(Stock)
 export class StockRepository extends Repository<Stock> {
@@ -87,5 +89,38 @@ export class StockRepository extends Repository<Stock> {
         throw new InternalServerErrorException();
       }
     }
+  }
+
+  async insertStockDetail(
+    stockDetail: StockDetail,
+    category: Category,
+  ): Promise<void> {
+    const {
+      number,
+      companyName,
+      type,
+      capital,
+      description,
+      dateOfListing,
+      dateOfEstablishing,
+    } = stockDetail;
+    const stock = await this.findOne({ number });
+    if (!stock) return;
+    stock.companyName = companyName;
+    stock.category = category;
+    stock.type = type;
+    stock.capital = capital;
+    stock.description = description;
+    stock.dateOfListing = dateOfListing;
+    stock.dateOfEstablishing = dateOfEstablishing;
+    await stock.save();
+  }
+
+  async getStocksWithoutDetail(): Promise<Stock[]> {
+    const stocks = await this.find({
+      select: ['number'],
+      where: { categoryId: null },
+    });
+    return stocks;
   }
 }

@@ -9,3 +9,16 @@ export function exportStocks(): string[][] {
 
   return stocks;
 }
+
+export function exportStockDetail(): string[] {
+  const tds = [...document.querySelectorAll('.solid_1_padding_4_4_tbl')].find(
+    ({ innerHTML }) =>
+      innerHTML.includes('名稱') && innerHTML.includes('產業別'),
+  );
+  if (!tds) return null;
+
+  const details = [...tds.querySelectorAll('tr td[bgcolor="white"]')].map(
+    (td) => td.textContent,
+  );
+  return details;
+}

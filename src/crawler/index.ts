@@ -1,23 +1,25 @@
 import * as puppeteer from 'puppeteer';
-import { exportStocks } from './utils';
-import { StockInfo } from './stock-info.interface';
+import { exportStocks, exportStockDetail } from './utils';
+import { StockType } from '../stocks/stock-type.enum';
+import { StockInfo } from '../stocks/stock-info.interface';
+import { StockDetail } from '../stocks/stock-detail.interface';
 
 export default class Crawler {
   private browser: puppeteer.Browser;
-  private page: puppeteer.Page;
   private HST_URL =
     'https://goodinfo.tw/StockInfo/StockList.asp?MARKET_CAT=%E6%99%BA%E6%85%A7%E9%81%B8%E8%82%A1&INDUSTRY_CAT=%E8%82%A1%E5%83%B9%E5%89%B5%E6%AD%B7%E5%8F%B2%E9%AB%98%E9%BB%9E%40%40%E8%82%A1%E5%83%B9%E5%89%B5%E5%A4%9A%E6%97%A5%E9%AB%98%E9%BB%9E%40%40%E6%AD%B7%E5%8F%B2';
   private TOP_URL =
     'https://goodinfo.tw/StockInfo/StockList.asp?MARKET_CAT=%E7%86%B1%E9%96%80%E6%8E%92%E8%A1%8C&INDUSTRY_CAT=%E6%88%90%E4%BA%A4%E9%87%91%E9%A1%8D+%28%E9%AB%98%E2%86%92%E4%BD%8E%29%40%40%E6%88%90%E4%BA%A4%E9%87%91%E9%A1%8D%40%40%E7%94%B1%E9%AB%98%E2%86%92%E4%BD%8E';
+  private STOCK_URL = 'https://goodinfo.tw/StockInfo/StockDetail.asp';
 
-  private async init(): Promise<void> {
+  public async init(): Promise<void> {
     this.browser = await puppeteer.launch(); // { headless: false }
   }
 
-  private async open(url: string): Promise<void> {
-    this.page = await this.browser.newPage();
-    await this.page.setRequestInterception(true);
-    this.page.on('request', (interceptedRequest) => {
+  private async open(url: string): Promise<puppeteer.Page> {
+    const page = await this.browser.newPage();
+    await page.setRequestInterception(true);
+    page.on('request', (interceptedRequest) => {
       const url = interceptedRequest.url();
       if (
         url.endsWith('.png') ||
@@ -29,15 +31,16 @@ export default class Crawler {
         interceptedRequest.continue();
       }
     });
-    await this.page.goto(url);
+    await page.goto(url);
+    return page;
   }
 
-  private async destory(): Promise<void> {
+  public async destory(): Promise<void> {
     await this.browser.close();
   }
 
-  private async sortBy(type: string): Promise<void> {
-    const button = await this.page.evaluateHandle((type) => {
+  private async sortBy(page: puppeteer.Page, type: string): Promise<void> {
+    const button = await page.evaluateHandle((type) => {
       const buttons = <HTMLAnchorElement[]>[
         ...document.querySelectorAll(
           '#tblStockList > thead:first-child tr td a.link_black',
@@ -54,13 +57,11 @@ export default class Crawler {
   }
 
   public async getHSTStocks(): Promise<StockInfo[]> {
-    await this.init();
-    await this.open(this.HST_URL);
-    await this.sortBy('漲跌幅');
+    const page = await this.open(this.HST_URL);
+    await this.sortBy(page, '漲跌幅');
     const arrayOfStocks = <string[][]>(
-      await this.page.evaluate(`(${exportStocks.toString()})()`)
+      await page.evaluate(`(${exportStocks.toString()})()`)
     );
-    await this.destory();
     const stocks: StockInfo[] = arrayOfStocks.map((stock: string[]) => ({
       number: stock[0],
       name: stock[1],
@@ -75,11 +76,10 @@ export default class Crawler {
   }
 
   public async getTOPStocks(): Promise<StockInfo[]> {
-    await this.init();
-    await this.open(this.TOP_URL);
-    await this.sortBy('漲跌幅');
+    const page = await this.open(this.TOP_URL);
+    await this.sortBy(page, '漲跌幅');
     const arrayOfStocks = <string[][]>(
-      await this.page.evaluate(`(${exportStocks.toString()})()`)
+      await page.evaluate(`(${exportStocks.toString()})()`)
     );
     await this.destory();
     const stocks = arrayOfStocks
@@ -99,5 +99,25 @@ export default class Crawler {
         lowest: parseFloat(stock[14]),
       }));
     return stocks;
+  }
+
+  public async getStockDetail(number: string): Promise<StockDetail> {
+    const page = await this.open(`${this.STOCK_URL}?STOCK_ID=${number}`);
+    const arrayOfDetail = <string[]>(
+      await page.evaluate(`(${exportStockDetail.toString()})()`)
+    );
+    await page.close();
+    if (!arrayOfDetail) return null;
+    const detail: StockDetail = {
+      number,
+      companyName: arrayOfDetail[0],
+      categoryName: arrayOfDetail[1],
+      type: arrayOfDetail[2] === '上櫃' ? StockType.OTC : StockType.LISTED,
+      capital: arrayOfDetail[4],
+      description: arrayOfDetail[14],
+      dateOfListing: new Date(arrayOfDetail[7].slice(0, 10)),
+      dateOfEstablishing: new Date(arrayOfDetail[6].slice(0, 10)),
+    };
+    return detail;
   }
 }
