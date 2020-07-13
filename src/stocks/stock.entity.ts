@@ -14,6 +14,7 @@ import { StockType } from './stock-type.enum';
 import { Category } from './category.entity';
 import { Hst } from './hst.entity';
 import { Top } from './top.entity';
+import { Distribution } from './distribution.entity';
 
 @Entity()
 @Unique(['number'])
@@ -80,4 +81,11 @@ export class Stock extends BaseEntity {
     { eager: true, cascade: true },
   )
   top?: Top[];
+
+  @OneToMany(
+    (type) => Distribution,
+    (distribution) => distribution.stock,
+    { eager: true, cascade: true },
+  )
+  distribution?: Distribution[];
 }

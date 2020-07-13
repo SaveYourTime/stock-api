@@ -123,4 +123,16 @@ export class StockRepository extends Repository<Stock> {
     });
     return stocks;
   }
+
+  async getStocksHaveNoDistribution(): Promise<Stock[]> {
+    const stocks = await this.createQueryBuilder('s')
+      .select(['s.id', 's.number', 'MAX(date) as date'])
+      .leftJoin('s.distribution', 'd')
+      .groupBy('s.id')
+      .addGroupBy('s.number')
+      .having('date IS null')
+      .orHaving('date < SUBDATE(CURRENT_DATE, INTERVAL 10 DAY)')
+      .getMany();
+    return stocks;
+  }
 }
