@@ -16,7 +16,7 @@ export class StocksService {
     return await this.stockRepository.findOne(id);
   }
 
-  @Cron('0 0 15 * * 1-5') // Monday to Friday at 03:00pm
+  @Cron('0 00 17 * * 1-5') // Monday to Friday at 17:00
   async handleCronHST(): Promise<void> {
     const crawler = new Crawler();
     await crawler.init();
@@ -25,7 +25,7 @@ export class StocksService {
     stocks.forEach((stock) => this.stockRepository.insertHST(stock));
   }
 
-  @Cron('0 05 15 * * 1-5') // Monday to Friday at 03:05pm
+  @Cron('0 05 17 * * 1-5') // Monday to Friday at 17:05
   async handleCronTOP(): Promise<void> {
     const crawler = new Crawler();
     await crawler.init();
@@ -34,7 +34,7 @@ export class StocksService {
     stocks.forEach((stock) => this.stockRepository.insertTOP(stock));
   }
 
-  @Cron('0 10 15 * * 1-5') // Monday to Friday at 03:10pm
+  @Cron('0 10 17 * * 1-5') // Monday to Friday at 17:10
   async handleCronDetail(): Promise<void> {
     const crawler = new Crawler();
     await crawler.init();
