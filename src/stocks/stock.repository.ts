@@ -1,4 +1,4 @@
-import { InternalServerErrorException } from '@nestjs/common';
+import { InternalServerErrorException, Logger } from '@nestjs/common';
 import { EntityRepository, Repository } from 'typeorm';
 import { Hst } from './hst.entity';
 import { Top } from './top.entity';
@@ -9,6 +9,7 @@ import { StockDetail } from './stock-detail.interface';
 
 @EntityRepository(Stock)
 export class StockRepository extends Repository<Stock> {
+  private readonly logger = new Logger(StockRepository.name);
   async insertHST(hstStock: StockInfo): Promise<void> {
     const {
       number,
@@ -39,7 +40,7 @@ export class StockRepository extends Repository<Stock> {
       await stock.save();
     } catch (error) {
       if (error.errno === 1062) {
-        console.log(`HST: ${name} already exists`);
+        this.logger.debug(`HST: ${name} already exists`);
       } else {
         throw new InternalServerErrorException();
       }
@@ -84,7 +85,7 @@ export class StockRepository extends Repository<Stock> {
       await stock.save();
     } catch (error) {
       if (error.errno === 1062) {
-        console.log(`TOP: ${name} already exists`);
+        this.logger.debug(`TOP: ${name} already exists`);
       } else {
         throw new InternalServerErrorException();
       }
