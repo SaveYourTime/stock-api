@@ -132,7 +132,7 @@ export class StockRepository extends Repository<Stock> {
       .groupBy('s.id')
       .addGroupBy('s.number')
       .having('date IS null')
-      .orHaving('date < SUBDATE(CURRENT_DATE, INTERVAL 10 DAY)')
+      .orHaving('date < SUBDATE(CURRENT_DATE, INTERVAL 7 DAY)')
       .getMany();
     return stocks;
   }
