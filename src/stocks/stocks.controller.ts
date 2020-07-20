@@ -8,6 +8,11 @@ import { Stock } from './stock.entity';
 export class StocksController {
   constructor(private stocksService: StocksService) {}
 
+  @Get('hst')
+  find7DaysHST(): Promise<void> {
+    return this.stocksService.find7DaysHST();
+  }
+
   @Get(':id')
   @ApiParam({ name: 'id', example: 1 })
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Stock> {
