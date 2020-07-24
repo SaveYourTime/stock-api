@@ -1,6 +1,7 @@
 import { EntityRepository, Repository } from 'typeorm';
 import { Top } from './top.entity';
 import { Category } from './category.entity';
+import { Subcategory } from './subcategory.entity';
 import { Distribution } from './distribution.entity';
 
 @EntityRepository(Top)
@@ -9,6 +10,12 @@ export class TopRepository extends Repository<Top> {
     const arrayOfTOP = await this.createQueryBuilder('t')
       .leftJoinAndSelect('t.stock', 's')
       .leftJoinAndMapOne('s.category', Category, 'c', 's.category = c.id')
+      .leftJoinAndMapOne(
+        's.subcategory',
+        Subcategory,
+        'sc',
+        's.category = sc.id',
+      )
       .leftJoinAndMapOne(
         's.distribution',
         Distribution,
