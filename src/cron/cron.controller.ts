@@ -22,6 +22,11 @@ export class CronController {
     return await this.cronService.handleCronDetail();
   }
 
+  @Get('subcategory')
+  async handleCronSubcategory(): Promise<void> {
+    return await this.cronService.handleCronSubcategory();
+  }
+
   @Get('distribution')
   async handleCronDistribution(): Promise<void> {
     return await this.cronService.handleCronDistribution();

@@ -12,6 +12,7 @@ import {
 } from 'typeorm';
 import { StockType } from './stock-type.enum';
 import { Category } from './category.entity';
+import { Subcategory } from './subcategory.entity';
 import { Hst } from './hst.entity';
 import { Top } from './top.entity';
 import { Distribution } from './distribution.entity';
@@ -46,6 +47,22 @@ export class Stock extends BaseEntity {
 
   @Column({ nullable: true })
   categoryId?: number;
+
+  @ManyToOne(
+    (type) => Subcategory,
+    (subcategory) => subcategory.stock,
+    {
+      eager: true,
+      cascade: true,
+      nullable: true,
+      onUpdate: 'CASCADE',
+    },
+  )
+  @JoinColumn({ name: 'subcategory_id', referencedColumnName: 'id' })
+  subcategory?: Subcategory;
+
+  @Column({ nullable: true })
+  subcategoryId?: number;
 
   @Column({ nullable: true })
   type?: StockType;

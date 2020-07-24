@@ -17,6 +17,7 @@ export default class Crawler {
   private STOCK_URL = 'https://goodinfo.tw/StockInfo/StockDetail.asp';
   private STOCK_EQUITY_DISTRIBUTION =
     'https://goodinfo.tw/StockInfo/EquityDistributionClassHis.asp';
+  private CMONEY_URL = 'https://www.cmoney.tw/follow/channel';
 
   public async init(): Promise<void> {
     this.browser = await puppeteer.launch(); // { headless: false }
@@ -136,5 +137,20 @@ export default class Crawler {
     );
     await page.close();
     return distribution;
+  }
+
+  public async getStockSubcategory(number: string): Promise<string> {
+    const page = await this.open(`${this.CMONEY_URL}/stock-${number}`);
+    let subcategory: string;
+    try {
+      subcategory = await page.$eval(
+        '.list7',
+        (element) => element?.children?.[6]?.querySelector('span')?.textContent,
+      );
+    } catch (error) {
+      console.log(`'產業類別' with stock number: '${number}' not found`);
+    }
+    await page.close();
+    return subcategory;
   }
 }

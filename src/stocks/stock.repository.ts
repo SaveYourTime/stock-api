@@ -125,6 +125,14 @@ export class StockRepository extends Repository<Stock> {
     return stocks;
   }
 
+  async getStocksWithoutSubcategory(): Promise<Stock[]> {
+    const stocks = await this.find({
+      select: ['number'],
+      where: { subcategoryId: null },
+    });
+    return stocks;
+  }
+
   async getStocksHaveNoDistribution(): Promise<Stock[]> {
     const stocks = await this.createQueryBuilder('s')
       .select(['s.id', 's.number', 'MAX(date) as date'])

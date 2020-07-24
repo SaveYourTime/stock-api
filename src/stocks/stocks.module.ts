@@ -4,6 +4,7 @@ import { StocksController } from './stocks.controller';
 import { StocksService } from './stocks.service';
 import { StockRepository } from './stock.repository';
 import { CategoryRepository } from './category.repository';
+import { SubcategoryRepository } from './subcategory.repository';
 import { HstRepository } from './hst.repository';
 
 @Module({
@@ -11,6 +12,7 @@ import { HstRepository } from './hst.repository';
     TypeOrmModule.forFeature([
       StockRepository,
       CategoryRepository,
+      SubcategoryRepository,
       HstRepository,
     ]),
   ],

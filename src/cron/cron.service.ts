@@ -3,6 +3,7 @@ import { Cron } from '@nestjs/schedule';
 import Crawler from '../crawler/index';
 import { StockRepository } from '../stocks/stock.repository';
 import { CategoryRepository } from '../stocks/category.repository';
+import { SubcategoryRepository } from '../stocks/subcategory.repository';
 import { Distribution } from '../stocks/distribution.entity';
 
 @Injectable()
@@ -12,6 +13,7 @@ export class CronService {
   constructor(
     private stockRepository: StockRepository,
     private categoryRepository: CategoryRepository,
+    private subcategoryRepository: SubcategoryRepository,
   ) {}
 
   @Cron('0 00 09,17 * * *') // Everyday at 09:00am and 05:00pm
@@ -66,6 +68,25 @@ export class CronService {
     }
     await crawler.destory();
     this.logger.debug('DONE: handleCronDetail');
+  }
+
+  @Cron('0 15 09,17 * * *') // Everyday at 09:15am and 05:15pm
+  async handleCronSubcategory(): Promise<void> {
+    this.logger.debug('CALLED: handleCronSubcategory');
+    const crawler = new Crawler();
+    await crawler.init();
+    const stocks = await this.stockRepository.getStocksWithoutSubcategory();
+    this.logger.debug(`We got ${stocks.length} stocks need to be process`);
+    for (const { number } of stocks) {
+      const subcate = await crawler.getStockSubcategory(number);
+      const subcategory = await this.subcategoryRepository.findOrCreateOne(
+        subcate,
+      );
+      await this.stockRepository.update({ number }, { subcategory });
+      await this.sleep(5);
+    }
+    await crawler.destory();
+    this.logger.debug('DONE: handleCronSubcategory');
   }
 
   @Cron('0 20 09,17 * * *') // Everyday at 09:20am and 05:20pm
