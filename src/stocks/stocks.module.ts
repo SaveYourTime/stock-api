@@ -6,6 +6,7 @@ import { StockRepository } from './stock.repository';
 import { CategoryRepository } from './category.repository';
 import { SubcategoryRepository } from './subcategory.repository';
 import { HstRepository } from './hst.repository';
+import { TopRepository } from './top.repository';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { HstRepository } from './hst.repository';
       CategoryRepository,
       SubcategoryRepository,
       HstRepository,
+      TopRepository,
     ]),
   ],
   controllers: [StocksController],

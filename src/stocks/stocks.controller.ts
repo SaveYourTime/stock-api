@@ -13,6 +13,11 @@ export class StocksController {
     return this.stocksService.find7DaysHST();
   }
 
+  @Get('top')
+  find7DaysTOP(): Promise<void> {
+    return this.stocksService.find7DaysTOP();
+  }
+
   @Get(':id')
   @ApiParam({ name: 'id', example: 1 })
   findOne(@Param('id', ParseIntPipe) id: number): Promise<Stock> {
