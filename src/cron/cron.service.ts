@@ -80,7 +80,7 @@ export class CronService {
     for (const { number } of stocks) {
       const subcate = await crawler.getStockSubcategory(number);
       const subcategory = await this.subcategoryRepository.findOrCreateOne(
-        subcate,
+        subcate || 'ETF',
       );
       await this.stockRepository.update({ number }, { subcategory });
       await this.sleep(5);
