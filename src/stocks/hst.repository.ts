@@ -14,7 +14,7 @@ export class HstRepository extends Repository<Hst> {
         's.subcategory',
         Subcategory,
         'sc',
-        's.category = sc.id',
+        's.subcategory = sc.id',
       )
       .leftJoinAndMapOne(
         's.distribution',
