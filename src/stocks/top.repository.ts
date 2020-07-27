@@ -27,14 +27,34 @@ export class TopRepository extends Repository<Top> {
       .addOrderBy('t.price_change_ratio', 'DESC')
       .addOrderBy('d.date', 'DESC')
       .getMany();
-    const top = arrayOfTOP.reduce((items, item) => {
-      const key = item.date.toString();
-      if (items[key]) {
-        items[key].push(item);
+
+    const unsortedTop = arrayOfTOP.reduce<{ [key: string]: Top[] }>(
+      (items, item) => {
+        const key = item.date.toString();
+        if (items[key]) {
+          items[key].push(item);
+          return items;
+        }
+        items[key] = [item];
         return items;
-      }
-      items[key] = [item];
-      return items;
+      },
+      {},
+    );
+
+    const top = Object.entries(unsortedTop).reduce((data, [key, value]) => {
+      const limitUp = [];
+      const rest = [];
+      value.forEach((stock) => {
+        const { closingPrice, highest, priceChangeRatio } = stock;
+        if (closingPrice === highest && priceChangeRatio >= 9.2) {
+          limitUp.push(stock);
+        } else {
+          rest.push(stock);
+        }
+      });
+      limitUp.sort((a, b) => a.rank - b.rank);
+      data[key] = [...limitUp, ...rest];
+      return data;
     }, {});
     return top;
   }
