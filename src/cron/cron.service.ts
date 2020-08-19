@@ -103,11 +103,15 @@ export class CronService {
     for (const { id, number } of pureStocks) {
       const dist = await crawler.getStockEquityDistribution(number);
       if (dist) {
-        const distribution = new Distribution();
-        distribution.stockId = id;
-        distribution.date = dist.date;
-        distribution.lessThan50 = dist.lessThan50;
-        await distribution.save();
+        try {
+          const distribution = new Distribution();
+          distribution.stockId = id;
+          distribution.date = dist.date;
+          distribution.lessThan50 = dist.lessThan50;
+          await distribution.save();
+        } catch (error) {
+          console.log(error);
+        }
       }
       await this.sleep(5);
     }
