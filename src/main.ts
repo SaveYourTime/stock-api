@@ -9,6 +9,7 @@ import {
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import * as helmet from 'helmet';
 import * as cookieParser from 'cookie-parser';
+import { Request, Response, NextFunction } from 'express';
 import { AppModule } from './app.module';
 
 const setupSwagger = (app: INestApplication): void => {
@@ -33,6 +34,12 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  app.use((req: Request, res: Response, next: NextFunction) => {
+    if (req.method === 'GET' && req.url === '/') {
+      return res.status(200).send('<h1>Hello World!</h1>');
+    }
+    next();
+  });
 
   setupSwagger(app);
   await app.listen(process.env.PORT ?? 3000);
