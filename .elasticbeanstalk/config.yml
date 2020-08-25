@@ -1,0 +1,17 @@
+branch-defaults:
+  master:
+    environment: stock-production
+global:
+  application_name: stock
+  branch: null
+  default_ec2_keyname: aws-aaronlu1
+  default_platform: Docker running on 64bit Amazon Linux 2
+  default_region: ap-northeast-1
+  include_git_submodules: true
+  instance_profile: null
+  platform_name: null
+  platform_version: null
+  profile: aaronlu1
+  repository: null
+  sc: git
+  workspace_type: Application
