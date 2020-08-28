@@ -20,7 +20,10 @@ export default class Crawler {
   private CMONEY_URL = 'https://www.cmoney.tw/follow/channel';
 
   public async init(): Promise<void> {
-    this.browser = await puppeteer.launch(); // { headless: false }
+    this.browser = await puppeteer.launch({
+      executablePath: process.env.CHROMIUM_PATH,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    }); // { headless: false }
   }
 
   private async open(url: string): Promise<puppeteer.Page> {
