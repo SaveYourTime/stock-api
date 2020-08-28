@@ -9,7 +9,7 @@ import { Distribution } from '../stocks/distribution.entity';
 @Injectable()
 export class CronService {
   private readonly logger = new Logger(CronService.name);
-  private readonly blackList = ['1101B', '2891C', '9103'];
+  private readonly blackList = ['01010T', '1101B', '2891C'];
   constructor(
     private stockRepository: StockRepository,
     private categoryRepository: CategoryRepository,
@@ -97,7 +97,9 @@ export class CronService {
     const stocks = await this.stockRepository.getStocksHaveNoDistribution();
     const pureStocks = stocks.filter(
       ({ number }) =>
-        !number.startsWith('0200') && !this.blackList.includes(number),
+        !number.startsWith('0200') &&
+        !number.startsWith('91') &&
+        !this.blackList.includes(number),
     );
     this.logger.debug(`We got ${pureStocks.length} stocks need to be process`);
     for (const { id, number } of pureStocks) {
