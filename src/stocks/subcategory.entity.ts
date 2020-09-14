@@ -16,10 +16,7 @@ export class Subcategory extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @OneToMany(
-    (type) => Stock,
-    (stock) => stock.subcategory,
-  )
+  @OneToMany((type) => Stock, (stock) => stock.subcategory)
   stock: Stock;
 
   @Column()

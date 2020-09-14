@@ -32,32 +32,24 @@ export class Stock extends BaseEntity {
   @Column({ nullable: true })
   companyName?: string;
 
-  @ManyToOne(
-    (type) => Category,
-    (category) => category.stock,
-    {
-      eager: true,
-      cascade: true,
-      nullable: true,
-      onUpdate: 'CASCADE',
-    },
-  )
+  @ManyToOne((type) => Category, (category) => category.stock, {
+    eager: true,
+    cascade: true,
+    nullable: true,
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'category_id', referencedColumnName: 'id' })
   category?: Category;
 
   @Column({ nullable: true })
   categoryId?: number;
 
-  @ManyToOne(
-    (type) => Subcategory,
-    (subcategory) => subcategory.stock,
-    {
-      eager: true,
-      cascade: true,
-      nullable: true,
-      onUpdate: 'CASCADE',
-    },
-  )
+  @ManyToOne((type) => Subcategory, (subcategory) => subcategory.stock, {
+    eager: true,
+    cascade: true,
+    nullable: true,
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'subcategory_id', referencedColumnName: 'id' })
   subcategory?: Subcategory;
 
@@ -85,24 +77,15 @@ export class Stock extends BaseEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @OneToMany(
-    (type) => Hst,
-    (hst) => hst.stock,
-    { eager: true, cascade: true },
-  )
+  @OneToMany((type) => Hst, (hst) => hst.stock, { eager: true, cascade: true })
   hst?: Hst[];
 
-  @OneToMany(
-    (type) => Top,
-    (top) => top.stock,
-    { eager: true, cascade: true },
-  )
+  @OneToMany((type) => Top, (top) => top.stock, { eager: true, cascade: true })
   top?: Top[];
 
-  @OneToMany(
-    (type) => Distribution,
-    (distribution) => distribution.stock,
-    { eager: true, cascade: true },
-  )
+  @OneToMany((type) => Distribution, (distribution) => distribution.stock, {
+    eager: true,
+    cascade: true,
+  })
   distribution?: Distribution[];
 }
