@@ -24,9 +24,7 @@ export class CronService {
     const stocks = await crawler.getHSTStocks();
     this.logger.debug(`We got ${stocks.length} stocks need to be process`);
     await crawler.destory();
-    const promises = stocks.map((stock) =>
-      this.stockRepository.insertHST(stock),
-    );
+    const promises = stocks.map((stock) => this.stockRepository.insertHST(stock));
     await Promise.all(promises);
     this.logger.debug('DONE: handleCronHST');
   }
@@ -39,9 +37,7 @@ export class CronService {
     const stocks = await crawler.getTOPStocks();
     this.logger.debug(`We got ${stocks.length} stocks need to be process`);
     await crawler.destory();
-    const promises = stocks.map((stock) =>
-      this.stockRepository.insertTOP(stock),
-    );
+    const promises = stocks.map((stock) => this.stockRepository.insertTOP(stock));
     await Promise.all(promises);
     this.logger.debug('DONE: handleCronTOP');
   }
@@ -56,9 +52,7 @@ export class CronService {
     for (const { number } of stocks) {
       const detail = await crawler.getStockDetail(number);
       if (detail) {
-        const category = await this.categoryRepository.findOrCreateOne(
-          detail.categoryName,
-        );
+        const category = await this.categoryRepository.findOrCreateOne(detail.categoryName);
         await this.stockRepository.insertStockDetail(detail, category);
       } else {
         const category = await this.categoryRepository.findOrCreateOne('ETF');
@@ -79,9 +73,7 @@ export class CronService {
     this.logger.debug(`We got ${stocks.length} stocks need to be process`);
     for (const { number } of stocks) {
       const subcate = await crawler.getStockSubcategory(number);
-      const subcategory = await this.subcategoryRepository.findOrCreateOne(
-        subcate || 'ETF',
-      );
+      const subcategory = await this.subcategoryRepository.findOrCreateOne(subcate || 'ETF');
       await this.stockRepository.update({ number }, { subcategory });
       await this.sleep(5);
     }
@@ -97,9 +89,7 @@ export class CronService {
     const stocks = await this.stockRepository.getStocksHaveNoDistribution();
     const pureStocks = stocks.filter(
       ({ number }) =>
-        !number.startsWith('0200') &&
-        !number.startsWith('91') &&
-        !this.blackList.includes(number),
+        !number.startsWith('0200') && !number.startsWith('91') && !this.blackList.includes(number),
     );
     this.logger.debug(`We got ${pureStocks.length} stocks need to be process`);
     for (const { id, number } of pureStocks) {

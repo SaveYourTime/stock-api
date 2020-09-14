@@ -11,15 +11,7 @@ import { StockDetail } from './stock-detail.interface';
 export class StockRepository extends Repository<Stock> {
   private readonly logger = new Logger(StockRepository.name);
   async insertHST(hstStock: StockInfo): Promise<void> {
-    const {
-      number,
-      name,
-      date,
-      closingPrice,
-      highest,
-      lowest,
-      priceChangeRatio,
-    } = hstStock;
+    const { number, name, date, closingPrice, highest, lowest, priceChangeRatio } = hstStock;
 
     let stock = await this.findOne({ number });
     if (!stock) {
@@ -92,10 +84,7 @@ export class StockRepository extends Repository<Stock> {
     }
   }
 
-  async insertStockDetail(
-    stockDetail: StockDetail,
-    category: Category,
-  ): Promise<void> {
+  async insertStockDetail(stockDetail: StockDetail, category: Category): Promise<void> {
     const {
       number,
       companyName,

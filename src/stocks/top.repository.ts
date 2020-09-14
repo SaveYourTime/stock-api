@@ -10,36 +10,23 @@ export class TopRepository extends Repository<Top> {
     const arrayOfTOP = await this.createQueryBuilder('t')
       .leftJoinAndSelect('t.stock', 's')
       .leftJoinAndMapOne('s.category', Category, 'c', 's.category = c.id')
-      .leftJoinAndMapOne(
-        's.subcategory',
-        Subcategory,
-        'sc',
-        's.subcategory = sc.id',
-      )
-      .leftJoinAndMapOne(
-        's.distribution',
-        Distribution,
-        'd',
-        's.id = d.stock_id',
-      )
+      .leftJoinAndMapOne('s.subcategory', Subcategory, 'sc', 's.subcategory = sc.id')
+      .leftJoinAndMapOne('s.distribution', Distribution, 'd', 's.id = d.stock_id')
       .where('t.date > SUBDATE(CURRENT_DATE, INTERVAL 7 DAY)')
       .orderBy('t.date', 'DESC')
       .addOrderBy('t.price_change_ratio', 'DESC')
       .addOrderBy('d.date', 'DESC')
       .getMany();
 
-    const unsortedTop = arrayOfTOP.reduce<{ [key: string]: Top[] }>(
-      (items, item) => {
-        const key = item.date.toString();
-        if (items[key]) {
-          items[key].push(item);
-          return items;
-        }
-        items[key] = [item];
+    const unsortedTop = arrayOfTOP.reduce<{ [key: string]: Top[] }>((items, item) => {
+      const key = item.date.toString();
+      if (items[key]) {
+        items[key].push(item);
         return items;
-      },
-      {},
-    );
+      }
+      items[key] = [item];
+      return items;
+    }, {});
 
     const top = Object.entries(unsortedTop).reduce((data, [key, value]) => {
       const limitUp = [];

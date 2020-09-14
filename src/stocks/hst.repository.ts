@@ -10,18 +10,8 @@ export class HstRepository extends Repository<Hst> {
     const arrayOfHST = await this.createQueryBuilder('h')
       .leftJoinAndSelect('h.stock', 's')
       .leftJoinAndMapOne('s.category', Category, 'c', 's.category = c.id')
-      .leftJoinAndMapOne(
-        's.subcategory',
-        Subcategory,
-        'sc',
-        's.subcategory = sc.id',
-      )
-      .leftJoinAndMapOne(
-        's.distribution',
-        Distribution,
-        'd',
-        's.id = d.stock_id',
-      )
+      .leftJoinAndMapOne('s.subcategory', Subcategory, 'sc', 's.subcategory = sc.id')
+      .leftJoinAndMapOne('s.distribution', Distribution, 'd', 's.id = d.stock_id')
       .where('h.date > SUBDATE(CURRENT_DATE, INTERVAL 7 DAY)')
       .orderBy('h.date', 'DESC')
       .addOrderBy('h.price_change_ratio', 'DESC')

@@ -12,6 +12,12 @@ import * as cookieParser from 'cookie-parser';
 import { Request, Response, NextFunction } from 'express';
 import { AppModule } from './app.module';
 
+const {
+  PORT = 80,
+  ACCESS_CONTROL_ALLOW_ORIGIN = '*',
+  ACCESS_CONTROL_ALLOW_CREDENTIALS = 'true',
+} = process.env;
+
 const setupSwagger = (app: INestApplication): void => {
   const options = new DocumentBuilder()
     .setTitle('Stock')
@@ -27,13 +33,14 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.setGlobalPrefix('v1');
   app.enableCors({
-    origin: process.env.ACCESS_CONTROL_ALLOW_ORIGIN,
-    credentials: process.env.ACCESS_CONTROL_ALLOW_CREDENTIALS === 'true',
+    origin: ACCESS_CONTROL_ALLOW_ORIGIN,
+    credentials: ACCESS_CONTROL_ALLOW_CREDENTIALS === 'true',
   });
   app.use(helmet());
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
+  // app.useGlobalInterceptors(new ClassSerializerInterceptor(new Reflector()));
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.method === 'GET' && req.url === '/') {
       return res.status(200).send('<h1>Hello World!</h1>');
@@ -42,14 +49,12 @@ async function bootstrap() {
   });
 
   setupSwagger(app);
-  await app.listen(process.env.PORT ?? 3000);
+  await app.listen(PORT);
 
   const logger = new Logger('bootstrap');
   const URL = await app.getUrl();
   logger.log(`Application is running on: ${URL}`);
   logger.log(`Swagger is running on: ${URL}/api`);
-  logger.log(
-    `Accepting requests from origin: "${process.env.ACCESS_CONTROL_ALLOW_ORIGIN}"`,
-  );
+  logger.log(`Accepting requests from origin: "${ACCESS_CONTROL_ALLOW_ORIGIN}"`);
 }
 bootstrap();

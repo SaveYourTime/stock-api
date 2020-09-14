@@ -1,9 +1,5 @@
 import * as puppeteer from 'puppeteer';
-import {
-  exportStocks,
-  exportStockDetail,
-  exportStockEquityDistribution,
-} from './utils';
+import { exportStocks, exportStockDetail, exportStockEquityDistribution } from './utils';
 import { StockType } from '../stocks/stock-type.enum';
 import { StockInfo } from '../stocks/stock-info.interface';
 import { StockDetail } from '../stocks/stock-detail.interface';
@@ -31,11 +27,7 @@ export default class Crawler {
     await page.setRequestInterception(true);
     page.on('request', (interceptedRequest) => {
       const url = interceptedRequest.url();
-      if (
-        url.endsWith('.png') ||
-        url.endsWith('.jpg') ||
-        url.endsWith('.gif')
-      ) {
+      if (url.endsWith('.png') || url.endsWith('.jpg') || url.endsWith('.gif')) {
         interceptedRequest.abort();
       } else {
         interceptedRequest.continue();
@@ -52,13 +44,9 @@ export default class Crawler {
   private async sortBy(page: puppeteer.Page, type: string): Promise<void> {
     const button = await page.evaluateHandle((type) => {
       const buttons = <HTMLAnchorElement[]>[
-        ...document.querySelectorAll(
-          '#tblStockList > thead:first-child tr td a.link_black',
-        ),
+        ...document.querySelectorAll('#tblStockList > thead:first-child tr td a.link_black'),
       ];
-      const button = buttons.find((button) =>
-        button.textContent.includes(type),
-      );
+      const button = buttons.find((button) => button.textContent.includes(type));
       return button;
     }, type);
     if (button) {
@@ -69,9 +57,7 @@ export default class Crawler {
   public async getHSTStocks(): Promise<StockInfo[]> {
     const page = await this.open(this.HST_URL);
     await this.sortBy(page, '漲跌幅');
-    const arrayOfStocks = <string[][]>(
-      await page.evaluate(`(${exportStocks.toString()})()`)
-    );
+    const arrayOfStocks = <string[][]>await page.evaluate(`(${exportStocks.toString()})()`);
     const stocks: StockInfo[] = arrayOfStocks.map((stock: string[]) => ({
       number: stock[0],
       name: stock[1],
@@ -88,9 +74,7 @@ export default class Crawler {
   public async getTOPStocks(): Promise<StockInfo[]> {
     const page = await this.open(this.TOP_URL);
     await this.sortBy(page, '漲跌幅');
-    const arrayOfStocks = <string[][]>(
-      await page.evaluate(`(${exportStocks.toString()})()`)
-    );
+    const arrayOfStocks = <string[][]>await page.evaluate(`(${exportStocks.toString()})()`);
     await this.destory();
     const stocks = arrayOfStocks
       .filter((stock) => parseFloat(stock[8]) >= 7.5)
@@ -113,9 +97,7 @@ export default class Crawler {
 
   public async getStockDetail(number: string): Promise<StockDetail> {
     const page = await this.open(`${this.STOCK_URL}?STOCK_ID=${number}`);
-    const arrayOfDetail = <string[]>(
-      await page.evaluate(`(${exportStockDetail.toString()})()`)
-    );
+    const arrayOfDetail = <string[]>await page.evaluate(`(${exportStockDetail.toString()})()`);
     await page.close();
     if (!arrayOfDetail) return null;
     const detail: StockDetail = {
@@ -132,12 +114,8 @@ export default class Crawler {
   }
 
   public async getStockEquityDistribution(number: string): Promise<any> {
-    const page = await this.open(
-      `${this.STOCK_EQUITY_DISTRIBUTION}?STOCK_ID=${number}`,
-    );
-    const distribution = await page.evaluate(
-      `(${exportStockEquityDistribution.toString()})()`,
-    );
+    const page = await this.open(`${this.STOCK_EQUITY_DISTRIBUTION}?STOCK_ID=${number}`);
+    const distribution = await page.evaluate(`(${exportStockEquityDistribution.toString()})()`);
     await page.close();
     return distribution;
   }
