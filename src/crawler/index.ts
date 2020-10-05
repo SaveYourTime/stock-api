@@ -106,7 +106,7 @@ export default class Crawler {
       categoryName: arrayOfDetail[1],
       type: arrayOfDetail[2] === '上櫃' ? StockType.OTC : StockType.LISTED,
       capital: arrayOfDetail[4],
-      description: arrayOfDetail[14],
+      description: arrayOfDetail[17],
       dateOfListing: new Date(arrayOfDetail[7].slice(0, 10)),
       dateOfEstablishing: new Date(arrayOfDetail[6].slice(0, 10)),
     };
