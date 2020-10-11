@@ -12,6 +12,6 @@ RUN yarn
 
 COPY . .
 
-EXPOSE 3200
+EXPOSE 5200
 
 CMD ["yarn", "start:dev"]
