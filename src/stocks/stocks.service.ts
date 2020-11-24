@@ -1,8 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, BadRequestException } from '@nestjs/common';
+import * as dayjs from 'dayjs';
 import { StockRepository } from './stock.repository';
 import { HstRepository } from './hst.repository';
 import { TopRepository } from './top.repository';
 import { Stock } from './stock.entity';
+import { FilterStockDto } from './filter-stock.dto';
 
 @Injectable()
 export class StocksService {
@@ -16,11 +18,19 @@ export class StocksService {
     return await this.stockRepository.findOne(id);
   }
 
-  async find7DaysHST(): Promise<void> {
-    return await this.hstRepository.find7DaysHST();
+  async find7DaysHST(filterStockDto: FilterStockDto): Promise<void> {
+    this.validateDateRange({ start: filterStockDto.start, end: filterStockDto.end }, 7);
+    return await this.hstRepository.find7DaysHST(filterStockDto);
   }
 
-  async find7DaysTOP(): Promise<void> {
-    return await this.topRepository.find7DaysTOP();
+  async find7DaysTOP(filterStockDto: FilterStockDto): Promise<void> {
+    this.validateDateRange({ start: filterStockDto.start, end: filterStockDto.end }, 7);
+    return await this.topRepository.find7DaysTOP(filterStockDto);
+  }
+
+  validateDateRange({ start, end }: { start: string; end: string }, days = 7): void {
+    if (dayjs(start).diff(dayjs(end), 'day') > days) {
+      throw new BadRequestException(`Date range must be in ${days} days`);
+    }
   }
 }

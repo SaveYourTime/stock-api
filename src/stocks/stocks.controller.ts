@@ -1,7 +1,8 @@
-import { Controller, Get, Param, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Param, Query, ParseIntPipe } from '@nestjs/common';
 import { ApiTags, ApiParam } from '@nestjs/swagger';
 import { StocksService } from './stocks.service';
 import { Stock } from './stock.entity';
+import { FilterStockDto } from './filter-stock.dto';
 
 @ApiTags('stocks')
 @Controller('stocks')
@@ -9,13 +10,13 @@ export class StocksController {
   constructor(private stocksService: StocksService) {}
 
   @Get('hst')
-  find7DaysHST(): Promise<void> {
-    return this.stocksService.find7DaysHST();
+  find7DaysHST(@Query() filterStockDto?: FilterStockDto): Promise<void> {
+    return this.stocksService.find7DaysHST(filterStockDto);
   }
 
   @Get('top')
-  find7DaysTOP(): Promise<void> {
-    return this.stocksService.find7DaysTOP();
+  find7DaysTOP(@Query() filterStockDto?: FilterStockDto): Promise<void> {
+    return this.stocksService.find7DaysTOP(filterStockDto);
   }
 
   @Get(':id')
