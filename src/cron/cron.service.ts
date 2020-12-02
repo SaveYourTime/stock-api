@@ -9,7 +9,7 @@ import { Distribution } from '../stocks/distribution.entity';
 @Injectable()
 export class CronService {
   private readonly logger = new Logger(CronService.name);
-  private readonly blackList = ['01010T', '1101B', '2891C'];
+  private readonly blackList = ['01010T', '00766L'];
   constructor(
     private stockRepository: StockRepository,
     private categoryRepository: CategoryRepository,
