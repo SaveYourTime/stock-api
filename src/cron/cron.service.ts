@@ -50,7 +50,9 @@ export class CronService {
     const stocks = await this.stockRepository.getStocksWithoutDetail();
     this.logger.debug(`We got ${stocks.length} stocks need to be process`);
     for (const { number } of stocks) {
+      this.logger.debug(`STOCK_NUMBER: ${number}`);
       const detail = await crawler.getStockDetail(number);
+      this.logger.debug(`DETAIL: ${JSON.stringify(detail)}`);
       if (detail) {
         const category = await this.categoryRepository.findOrCreateOne(detail.categoryName);
         await this.stockRepository.insertStockDetail(detail, category);
