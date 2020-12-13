@@ -40,7 +40,6 @@ async function bootstrap() {
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  // app.useGlobalInterceptors(new ClassSerializerInterceptor(new Reflector()));
   app.use((req: Request, res: Response, next: NextFunction) => {
     if (req.method === 'GET' && req.url === '/') {
       return res.status(200).send('<h1>Hello World!</h1>');

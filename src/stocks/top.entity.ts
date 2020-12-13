@@ -18,14 +18,10 @@ export class Top extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @ManyToOne(
-    (type) => Stock,
-    (stock) => stock.top, // TODO: top or id?
-    {
-      nullable: false,
-      onUpdate: 'CASCADE',
-    },
-  )
+  @ManyToOne((type) => Stock, (stock) => stock.top, {
+    nullable: false,
+    onUpdate: 'CASCADE',
+  })
   @JoinColumn({ name: 'stock_id', referencedColumnName: 'id' })
   stock: Stock;
 

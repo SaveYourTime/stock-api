@@ -19,7 +19,7 @@ export default class Crawler {
     this.browser = await puppeteer.launch({
       executablePath: process.env.CHROMIUM_PATH,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
-    }); // { headless: false }
+    });
   }
 
   private async open(url: string): Promise<puppeteer.Page> {
