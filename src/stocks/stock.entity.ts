@@ -5,6 +5,7 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  DeleteDateColumn,
   Unique,
   OneToMany,
   ManyToOne,
@@ -76,6 +77,9 @@ export class Stock extends BaseEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 
   @OneToMany((type) => Hst, (hst) => hst.stock, { eager: true, cascade: true })
   hst?: Hst[];
