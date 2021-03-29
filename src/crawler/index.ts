@@ -61,12 +61,12 @@ export default class Crawler {
     const stocks: StockInfo[] = arrayOfStocks.map((stock: string[]) => ({
       number: stock[0],
       name: stock[1],
-      date: new Date(`${new Date().getFullYear()}/${stock[2]}`),
-      closingPrice: parseFloat(stock[3]),
-      highest: parseFloat(stock[4]),
-      lowest: parseFloat(stock[5]),
-      priceSpread: parseFloat(stock[6]),
-      priceChangeRatio: parseFloat(stock[7]),
+      date: new Date(`${new Date().getFullYear()}/${stock[7]}`),
+      closingPrice: parseFloat(stock[2]),
+      highest: parseFloat(stock[3]),
+      lowest: parseFloat(stock[4]),
+      priceSpread: parseFloat(stock[5]),
+      priceChangeRatio: parseFloat(stock[6]),
     }));
     return stocks;
   }
