@@ -42,6 +42,12 @@ export default class Crawler {
   }
 
   private async sortBy(page: puppeteer.Page, type: string): Promise<void> {
+    await page.evaluate(() =>
+      document
+        .querySelector<HTMLSelectElement>('td[style="background:#fff2cc;color:red;"] select')
+        .onchange(null),
+    );
+    await page.waitForNavigation();
     const button = await page.evaluateHandle((type) => {
       const buttons = <HTMLAnchorElement[]>[
         ...document.querySelectorAll('#tblStockList > thead:first-child tr td a.link_black'),
