@@ -1,6 +1,7 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Query } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { CronService } from './cron.service';
+import { FilterDateDto } from './filter-date.dto';
 
 @ApiTags('cron')
 @Controller('cron')
@@ -13,8 +14,8 @@ export class CronController {
   }
 
   @Get('top')
-  async handleCronTOP(): Promise<void> {
-    return await this.cronService.handleCronTOP();
+  async handleCronTOP(@Query() filterDateDto?: FilterDateDto): Promise<void> {
+    return await this.cronService.handleCronTOP(filterDateDto.date);
   }
 
   @Get('detail')

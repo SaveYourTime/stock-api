@@ -41,27 +41,49 @@ export default class Crawler {
     await this.browser.close();
   }
 
-  private async sortBy(page: puppeteer.Page, type: string): Promise<void> {
+  private async byPass(page: puppeteer.Page) {
     await page.evaluate(() =>
       document
         .querySelector<HTMLSelectElement>('td[style="background:#fff2cc;color:red;"] select')
         .onchange(null),
     );
     await page.waitForNavigation();
-    const button = await page.evaluateHandle((type) => {
-      const buttons = <HTMLAnchorElement[]>[
-        ...document.querySelectorAll('#tblStockList > thead:first-child tr td a.link_black'),
-      ];
-      const button = buttons.find((button) => button.textContent.includes(type));
-      return button;
-    }, type);
-    if (button) {
-      await button.asElement().click();
-    }
+  }
+
+  private async selectDate(page: puppeteer.Page, date: string): Promise<void> {
+    if (!date) return null;
+    const select = await page.$('#selRPT_TIME');
+    await select.select(date.replace(/-/g, '/'));
+    await page.waitForResponse(
+      (response) =>
+        response.url().startsWith('https://goodinfo.tw/StockInfo/StockList.asp') &&
+        response.status() === 200,
+    );
+  }
+
+  private async sortBy(page: puppeteer.Page, type: string): Promise<void> {
+    await page.$$eval(
+      '#tblStockList > thead:first-child tr td a.link_black',
+      (buttons, type) => {
+        const button = buttons.find((button) =>
+          button.textContent.includes(type),
+        ) as HTMLAnchorElement;
+        if (button) {
+          button.click();
+        }
+      },
+      type,
+    );
+    await page.waitForResponse(
+      (response) =>
+        response.url().startsWith('https://goodinfo.tw/StockInfo/StockList.asp') &&
+        response.status() === 200,
+    );
   }
 
   public async getHSTStocks(): Promise<StockInfo[]> {
     const page = await this.open(this.HST_URL);
+    await this.byPass(page);
     await this.sortBy(page, '漲跌幅');
     const arrayOfStocks = <string[][]>await page.evaluate(`(${exportStocks.toString()})()`);
     const stocks: StockInfo[] = arrayOfStocks.map((stock: string[]) => ({
@@ -77,11 +99,12 @@ export default class Crawler {
     return stocks;
   }
 
-  public async getTOPStocks(): Promise<StockInfo[]> {
+  public async getTOPStocks(date?: string): Promise<StockInfo[]> {
     const page = await this.open(this.TOP_URL);
+    await this.byPass(page);
+    await this.selectDate(page, date);
     await this.sortBy(page, '漲跌幅');
     const arrayOfStocks = <string[][]>await page.evaluate(`(${exportStocks.toString()})()`);
-    await this.destory();
     const stocks = arrayOfStocks
       .filter((stock) => parseFloat(stock[8]) >= 7.5)
       .map((stock: string[]) => ({

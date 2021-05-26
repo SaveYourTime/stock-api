@@ -29,11 +29,11 @@ export class CronService {
   }
 
   @Cron('0 05 09,17 * * *') // Everyday at 09:05am and 05:05pm
-  async handleCronTOP(): Promise<void> {
+  async handleCronTOP(date?: string): Promise<void> {
     this.logger.debug('CALLED: handleCronTOP');
     const crawler = new Crawler();
     await crawler.init();
-    const stocks = await crawler.getTOPStocks();
+    const stocks = await crawler.getTOPStocks(date);
     this.logger.debug(`We got ${stocks.length} stocks need to be process`);
     await crawler.destory();
     const promises = stocks.map((stock) => this.stockRepository.insertTOP(stock));
