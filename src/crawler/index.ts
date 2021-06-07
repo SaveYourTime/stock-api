@@ -63,7 +63,7 @@ export default class Crawler {
 
   private async sortBy(page: puppeteer.Page, type: string): Promise<void> {
     await page.$$eval(
-      '#tblStockList > thead:first-child tr td a.link_black',
+      '#tblStockList > tbody:first-child tr td a.link_black',
       (buttons, type) => {
         const button = buttons.find((button) =>
           button.textContent.includes(type),

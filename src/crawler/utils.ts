@@ -9,7 +9,7 @@ export function exportStocks(): string[][] {
 }
 
 export function exportStockDetail(): string[] {
-  const tds = [...document.querySelectorAll('.solid_1_padding_4_4_tbl')].find(
+  const tds = [...document.querySelectorAll('table.b1.p4_4.r10')].find(
     ({ innerHTML }) => innerHTML.includes('名稱') && innerHTML.includes('產業別'),
   );
   if (!tds) return null;
