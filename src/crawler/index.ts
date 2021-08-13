@@ -63,7 +63,7 @@ export default class Crawler {
 
   private async sortBy(page: puppeteer.Page, type: string): Promise<void> {
     await page.$$eval(
-      '#tblStockList > tbody:first-child tr td a.link_black',
+      '#tblStockList > tbody:first-child tr th a.link_black',
       (buttons, type) => {
         const button = buttons.find((button) =>
           button.textContent.includes(type),
@@ -105,23 +105,27 @@ export default class Crawler {
     await this.selectDate(page, date);
     await this.sortBy(page, '漲跌幅');
     const arrayOfStocks = <string[][]>await page.evaluate(`(${exportStocks.toString()})()`);
-    const stocks = arrayOfStocks
-      .filter((stock) => parseFloat(stock[8]) >= 7.5)
-      .map((stock: string[]) => ({
-        rank: parseInt(stock[0]),
-        number: stock[1],
-        name: stock[2],
-        date: new Date(`${new Date().getFullYear()}/${stock[4]}`),
-        closingPrice: parseFloat(stock[6]),
-        priceSpread: parseFloat(stock[7]),
-        priceChangeRatio: parseFloat(stock[8]),
-        totalVolume: parseInt(stock[9].replace(/,/g, '')),
-        totalCost: parseInt(stock[10].replace(/,/g, '')),
-        openingPrice: parseFloat(stock[12]),
-        highest: parseFloat(stock[13]),
-        lowest: parseFloat(stock[14]),
-      }));
-    return stocks;
+    const stocks = arrayOfStocks.filter((stock) => parseFloat(stock[8]) >= 7.5);
+    // at least 20 stocks
+    if (stocks.length < 20) {
+      const restStocks = arrayOfStocks.slice(stocks.length, 20);
+      restStocks.forEach((stock) => stocks.push(stock));
+    }
+    const top = stocks.map((stock: string[]) => ({
+      rank: parseInt(stock[0]),
+      number: stock[1],
+      name: stock[2],
+      date: new Date(`${new Date().getFullYear()}/${stock[4]}`),
+      closingPrice: parseFloat(stock[6]),
+      priceSpread: parseFloat(stock[7]),
+      priceChangeRatio: parseFloat(stock[8]),
+      totalVolume: parseInt(stock[9].replace(/,/g, '')),
+      totalCost: parseInt(stock[10].replace(/,/g, '')),
+      openingPrice: parseFloat(stock[12]),
+      highest: parseFloat(stock[13]),
+      lowest: parseFloat(stock[14]),
+    }));
+    return top;
   }
 
   public async getStockDetail(number: string): Promise<StockDetail> {
