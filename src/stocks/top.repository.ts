@@ -1,4 +1,6 @@
 import { EntityRepository, Repository } from 'typeorm';
+import * as dayjs from 'dayjs';
+import { groupBy } from 'lodash';
 import { Top } from './top.entity';
 import { Category } from './category.entity';
 import { Subcategory } from './subcategory.entity';
@@ -24,15 +26,18 @@ export class TopRepository extends Repository<Top> {
     }
     const arrayOfTOP = await query.getMany();
 
-    const unsortedTop = arrayOfTOP.reduce<{ [key: string]: Top[] }>((items, item) => {
-      const key = item.date.toString();
-      if (items[key]) {
-        items[key].push(item);
-        return items;
-      }
-      items[key] = [item];
-      return items;
-    }, {});
+    const arrayOfTOPWithPrevious = await Promise.all(
+      arrayOfTOP.map(async (hst) => {
+        const previous = await this.createQueryBuilder('t')
+          .where('t.stock_id = :stockId', { stockId: hst.stockId })
+          .andWhere('t.date > :date', { date: `${dayjs().year()}-01-01` })
+          .orderBy('t.date', 'DESC')
+          .getMany();
+        return { ...hst, previous };
+      }),
+    );
+
+    const unsortedTop = groupBy(arrayOfTOPWithPrevious, 'date');
 
     const top = Object.entries(unsortedTop).reduce((data, [key, value]) => {
       const limitUp = [];

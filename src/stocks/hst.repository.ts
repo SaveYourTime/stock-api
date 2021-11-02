@@ -1,4 +1,6 @@
 import { EntityRepository, Repository } from 'typeorm';
+import * as dayjs from 'dayjs';
+import { groupBy } from 'lodash';
 import { Hst } from './hst.entity';
 import { Category } from './category.entity';
 import { Subcategory } from './subcategory.entity';
@@ -24,15 +26,18 @@ export class HstRepository extends Repository<Hst> {
     }
     const arrayOfHST = await query.getMany();
 
-    const hst = arrayOfHST.reduce((items, item) => {
-      const key = item.date.toString();
-      if (items[key]) {
-        items[key].push(item);
-        return items;
-      }
-      items[key] = [item];
-      return items;
-    }, {});
+    const arrayOfHSTWithPrevious = await Promise.all(
+      arrayOfHST.map(async (hst) => {
+        const previous = await this.createQueryBuilder('h')
+          .where('h.stock_id = :stockId', { stockId: hst.stockId })
+          .andWhere('h.date > :date', { date: `${dayjs().year()}-01-01` })
+          .orderBy('h.date', 'DESC')
+          .getMany();
+        return { ...hst, previous };
+      }),
+    );
+
+    const hst = groupBy(arrayOfHSTWithPrevious, 'date');
     return hst;
   }
 }
