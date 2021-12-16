@@ -6,10 +6,9 @@ import { StockDetail } from '../stocks/stock-detail.interface';
 
 export default class Crawler {
   private browser: puppeteer.Browser;
-  private HST_URL =
-    'https://goodinfo.tw/StockInfo/StockList.asp?MARKET_CAT=%E6%99%BA%E6%85%A7%E9%81%B8%E8%82%A1&INDUSTRY_CAT=%E8%82%A1%E5%83%B9%E5%89%B5%E6%AD%B7%E5%8F%B2%E9%AB%98%E9%BB%9E%40%40%E8%82%A1%E5%83%B9%E5%89%B5%E5%A4%9A%E6%97%A5%E9%AB%98%E9%BB%9E%40%40%E6%AD%B7%E5%8F%B2';
-  private TOP_URL =
-    'https://goodinfo.tw/StockInfo/StockList.asp?MARKET_CAT=%E7%86%B1%E9%96%80%E6%8E%92%E8%A1%8C&INDUSTRY_CAT=%E6%88%90%E4%BA%A4%E9%87%91%E9%A1%8D+%28%E9%AB%98%E2%86%92%E4%BD%8E%29%40%40%E6%88%90%E4%BA%A4%E9%87%91%E9%A1%8D%40%40%E7%94%B1%E9%AB%98%E2%86%92%E4%BD%8E';
+  private URL = 'https://goodinfo.tw/tw/StockList.asp';
+  private HST_URL = `${this.URL}?MARKET_CAT=%E6%99%BA%E6%85%A7%E9%81%B8%E8%82%A1&INDUSTRY_CAT=%E8%82%A1%E5%83%B9%E5%89%B5%E6%AD%B7%E5%8F%B2%E9%AB%98%E9%BB%9E%40%40%E8%82%A1%E5%83%B9%E5%89%B5%E5%A4%9A%E6%97%A5%E9%AB%98%E9%BB%9E%40%40%E6%AD%B7%E5%8F%B2`;
+  private TOP_URL = `${this.URL}?MARKET_CAT=%E7%86%B1%E9%96%80%E6%8E%92%E8%A1%8C&INDUSTRY_CAT=%E6%88%90%E4%BA%A4%E9%87%91%E9%A1%8D+%28%E9%AB%98%E2%86%92%E4%BD%8E%29%40%40%E6%88%90%E4%BA%A4%E9%87%91%E9%A1%8D%40%40%E7%94%B1%E9%AB%98%E2%86%92%E4%BD%8E`;
   private STOCK_URL = 'https://goodinfo.tw/StockInfo/StockDetail.asp';
   private STOCK_EQUITY_DISTRIBUTION =
     'https://goodinfo.tw/StockInfo/EquityDistributionClassHis.asp';
@@ -17,6 +16,8 @@ export default class Crawler {
 
   public async init(): Promise<void> {
     this.browser = await puppeteer.launch({
+      // devtools: true,
+      // headless: false,
       executablePath: process.env.CHROMIUM_PATH,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
@@ -55,9 +56,7 @@ export default class Crawler {
     const select = await page.$('#selRPT_TIME');
     await select.select(date.replace(/-/g, '/'));
     await page.waitForResponse(
-      (response) =>
-        response.url().startsWith('https://goodinfo.tw/StockInfo/StockList.asp') &&
-        response.status() === 200,
+      (response) => response.url().startsWith(this.URL) && response.status() === 200,
     );
   }
 
@@ -75,9 +74,7 @@ export default class Crawler {
       type,
     );
     await page.waitForResponse(
-      (response) =>
-        response.url().startsWith('https://goodinfo.tw/StockInfo/StockList.asp') &&
-        response.status() === 200,
+      (response) => response.url().startsWith(this.URL) && response.status() === 200,
     );
   }
 
