@@ -8,6 +8,10 @@ import { StockType } from '../stocks/stock-type.enum';
 import { StockInfo } from '../stocks/stock-info.interface';
 import { StockDetail } from '../stocks/stock-detail.interface';
 
+puppeteer.use(StealthPlugin());
+puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
+puppeteer.use(AnonymizeUaPlugin());
+
 export default class Crawler {
   private browser: Browser;
   private GOODINFO_URL = 'https://goodinfo.tw/tw/StockList.asp';
@@ -19,9 +23,6 @@ export default class Crawler {
   private CMONEY_URL = 'https://www.cmoney.tw';
 
   public async init(): Promise<void> {
-    puppeteer.use(StealthPlugin());
-    puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
-    puppeteer.use(AnonymizeUaPlugin());
     this.browser = await puppeteer.launch({
       // devtools: true,
       // headless: false,
