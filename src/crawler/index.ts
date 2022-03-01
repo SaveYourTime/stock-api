@@ -1,11 +1,15 @@
-import * as puppeteer from 'puppeteer';
+import { Browser, Page } from 'puppeteer';
+import puppeteer from 'puppeteer-extra';
+import StealthPlugin = require('puppeteer-extra-plugin-stealth');
+import AdblockerPlugin from 'puppeteer-extra-plugin-adblocker';
+import * as AnonymizeUaPlugin from 'puppeteer-extra-plugin-anonymize-ua';
 import { exportStocks, exportStockDetail, exportStockEquityDistribution } from './utils';
 import { StockType } from '../stocks/stock-type.enum';
 import { StockInfo } from '../stocks/stock-info.interface';
 import { StockDetail } from '../stocks/stock-detail.interface';
 
 export default class Crawler {
-  private browser: puppeteer.Browser;
+  private browser: Browser;
   private GOODINFO_URL = 'https://goodinfo.tw/tw/StockList.asp';
   private HST_URL = `${this.GOODINFO_URL}?MARKET_CAT=%E6%99%BA%E6%85%A7%E9%81%B8%E8%82%A1&INDUSTRY_CAT=%E8%82%A1%E5%83%B9%E5%89%B5%E6%AD%B7%E5%8F%B2%E9%AB%98%E9%BB%9E%40%40%E8%82%A1%E5%83%B9%E5%89%B5%E5%A4%9A%E6%97%A5%E9%AB%98%E9%BB%9E%40%40%E6%AD%B7%E5%8F%B2`;
   private TOP_URL = `${this.GOODINFO_URL}?MARKET_CAT=%E7%86%B1%E9%96%80%E6%8E%92%E8%A1%8C&INDUSTRY_CAT=%E6%88%90%E4%BA%A4%E9%87%91%E9%A1%8D+%28%E9%AB%98%E2%86%92%E4%BD%8E%29%40%40%E6%88%90%E4%BA%A4%E9%87%91%E9%A1%8D%40%40%E7%94%B1%E9%AB%98%E2%86%92%E4%BD%8E`;
@@ -15,6 +19,9 @@ export default class Crawler {
   private CMONEY_URL = 'https://www.cmoney.tw';
 
   public async init(): Promise<void> {
+    puppeteer.use(StealthPlugin());
+    puppeteer.use(AdblockerPlugin({ blockTrackers: true }));
+    puppeteer.use(AnonymizeUaPlugin());
     this.browser = await puppeteer.launch({
       // devtools: true,
       // headless: false,
@@ -23,17 +30,8 @@ export default class Crawler {
     });
   }
 
-  private async open(url: string): Promise<puppeteer.Page> {
+  private async open(url: string): Promise<Page> {
     const page = await this.browser.newPage();
-    await page.setRequestInterception(true);
-    page.on('request', (interceptedRequest) => {
-      const url = interceptedRequest.url();
-      if (url.endsWith('.png') || url.endsWith('.jpg') || url.endsWith('.gif')) {
-        interceptedRequest.abort();
-      } else {
-        interceptedRequest.continue();
-      }
-    });
     await page.goto(url);
     return page;
   }
@@ -42,7 +40,7 @@ export default class Crawler {
     await this.browser.close();
   }
 
-  private async byPass(page: puppeteer.Page) {
+  private async byPass(page: Page) {
     await page.evaluate(() =>
       document
         .querySelector<HTMLSelectElement>('td[style="background:#fff2cc;color:red;"] select')
@@ -51,7 +49,7 @@ export default class Crawler {
     await page.waitForNavigation();
   }
 
-  private async selectDate(page: puppeteer.Page, date: string): Promise<void> {
+  private async selectDate(page: Page, date: string): Promise<void> {
     if (!date) return null;
     const select = await page.$('#selRPT_TIME');
     await select.select(date.replace(/-/g, '/'));
@@ -60,7 +58,7 @@ export default class Crawler {
     );
   }
 
-  private async sortBy(page: puppeteer.Page, type: string): Promise<void> {
+  private async sortBy(page: Page, type: string): Promise<void> {
     await page.$$eval(
       '#tblStockList > tbody:first-child tr th a.link_black',
       (buttons, type: string) => {
