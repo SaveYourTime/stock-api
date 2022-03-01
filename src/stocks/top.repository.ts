@@ -42,7 +42,7 @@ export class TopRepository extends Repository<Top> {
     const top = Object.entries(unsortedTop).reduce((data, [key, value]) => {
       const limitUp = [];
       const rest = [];
-      value.forEach((stock) => {
+      (value as any[]).forEach((stock) => {
         const { closingPrice, highest, priceChangeRatio } = stock;
         if (closingPrice === highest && priceChangeRatio >= 9.2) {
           limitUp.push(stock);

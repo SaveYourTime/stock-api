@@ -1,4 +1,4 @@
-require('dotenv').config();
+import 'dotenv/config';
 import { NestFactory, Reflector } from '@nestjs/core';
 import {
   Logger,
@@ -7,7 +7,8 @@ import {
   ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
-import * as helmet from 'helmet';
+import helmet from 'helmet';
+import * as compression from 'compression';
 import * as cookieParser from 'cookie-parser';
 import { Request, Response, NextFunction } from 'express';
 import { AppModule } from './app.module';
@@ -37,6 +38,7 @@ async function bootstrap() {
     credentials: ACCESS_CONTROL_ALLOW_CREDENTIALS === 'true',
   });
   app.use(helmet());
+  app.use(compression());
   app.use(cookieParser());
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
