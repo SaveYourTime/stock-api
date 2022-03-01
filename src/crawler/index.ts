@@ -102,9 +102,9 @@ export default class Crawler {
     await this.sortBy(page, '漲跌幅');
     const arrayOfStocks = <string[][]>await page.evaluate(`(${exportStocks.toString()})()`);
     const stocks = arrayOfStocks.filter((stock) => parseFloat(stock[8]) >= 7.5);
-    // at least 20 stocks
-    if (stocks.length < 20) {
-      const restStocks = arrayOfStocks.slice(stocks.length, 20);
+    // at least 30 stocks
+    if (stocks.length < 30) {
+      const restStocks = arrayOfStocks.slice(stocks.length, 30);
       restStocks.forEach((stock) => stocks.push(stock));
     }
     const top = stocks.map((stock: string[]) => ({
