@@ -82,7 +82,7 @@ export class CronService {
     this.logger.debug('DONE: handleCronSubcategory');
   }
 
-  @Cron('0 */30 10-16 * * *') // Everyday every 30 minutes between 10am and 04pm
+  // @Cron('0 */30 10-16 * * *') // Everyday every 30 minutes between 10am and 04pm
   async handleCronDistribution(): Promise<void> {
     this.logger.debug('CALLED: handleCronDistribution');
     const crawler = new Crawler();
