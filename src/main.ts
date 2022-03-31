@@ -37,6 +37,7 @@ async function bootstrap() {
     origin: ACCESS_CONTROL_ALLOW_ORIGIN,
     credentials: ACCESS_CONTROL_ALLOW_CREDENTIALS === 'true',
   });
+  setupSwagger(app);
   app.use(helmet());
   app.use(compression());
   app.use(cookieParser());
@@ -49,7 +50,6 @@ async function bootstrap() {
     next();
   });
 
-  setupSwagger(app);
   await app.listen(PORT);
 
   const logger = new Logger('bootstrap');
